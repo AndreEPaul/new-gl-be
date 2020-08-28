@@ -2,30 +2,43 @@ from flask import Flask, render_template
 from bs4 import BeautifulSoup as bs
 import requests
 
-rd_url = 'https://www.fantasypros.com/nfl/rankings/consensus-cheatsheets.php'
-dy_url = 'https://www.fantasypros.com/nfl/rankings/dynasty-overall.php'
+redraft_url = 'https://www.fantasypros.com/nfl/rankings/consensus-cheatsheets.php'
+dynasty_url = 'https://www.fantasypros.com/nfl/rankings/dynasty-overall.php'
+rookie_url = 'https://www.fantasypros.com/nfl/rankings/rookies.php'
 
-rd_resp = requests.get(rd_url)
-dy_resp = requests.get(dy_url)
+redraft_resp = requests.get(redraft_url)
+dynasty_resp = requests.get(dynasty_url)
+rookie_resp = requests.get(rookie_url)
 
-rd_soup = bs(rd_resp.text, 'html.parser')
-dy_soup = bs(dy_resp.text, 'html.parser')
+redraft_soup = bs(redraft_resp.text, 'html.parser')
+dynasty_soup = bs(dynasty_resp.text, 'html.parser')
+rookie_soup = bs(rookie_resp.text, 'html.parser')
 
-rd_ranks = []
-dy_ranks = []
+redraft_ranks = []
+dynasty_ranks = []
+rookie_ranks = []
 
-for tr in rd_soup.find_all('tr'):
+for tr in redraft_soup.find_all('tr'):
     td = tr.find_all(class_="full-name")
     if(td != []):
-        rd_ranks.append(td[0].text)
+        redraft_ranks.append(td[0].text)
 
-for tr in dy_soup.find_all('tr'):
+for tr in dynasty_soup.find_all('tr'):
     td = tr.find_all(class_="full-name")
     if(td != []):
-        dy_ranks.append(td[0].text)
+        dynasty_ranks.append(td[0].text)
 
-for elt in rd_ranks[:10]:
-    print(elt)
+for tr in rookie_soup.find_all('tr'):
+    td = tr.find_all(class_="full-name")
+    if(td != []):
+        rookie_ranks.append(td[0].text)
 
-for elt in dy_ranks[:10]:
-    print(elt)
+# for elt in redraft_ranks[:10]:
+#     print(elt)
+
+# for elt in dynasty_ranks[:10]:
+#     print(elt)
+
+# for elt in rookie_ranks[:10]:
+#     print(elt)
+
