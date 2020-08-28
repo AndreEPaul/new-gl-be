@@ -1,20 +1,17 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 import googleapiclient.discovery
 from google.oauth2 import service_account
+from fuzzywuzzy import fuzz, process
+import webscraper
 
 app = Flask(__name__)
 
-# @app.route('/time')
-# def get_current_time():
-#    return {'time': time.time()}
+# credit to "https://github.com/jessamynsmith/flask-google-sheets" for Google Sheets help
 
 def get_credentials():
     scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
     GOOGLE_PRIVATE_KEY = os.environ["GOOGLE_PRIVATE_KEY"]
-    # The environment variable has escaped newlines, so remove the extra backslash
-    # (don't think I need this.)
-    # GOOGLE_PRIVATE_KEY = GOOGLE_PRIVATE_KEY.replace('\\n', '\n')
 
     account_info = {
       "private_key": GOOGLE_PRIVATE_KEY,
@@ -30,10 +27,8 @@ def get_service(service_name='sheets', api_version='v4'):
     service = googleapiclient.discovery.build(service_name, api_version, credentials=credentials)
     return service
 
-app = Flask(__name__)
-
-@app.route('/', methods=['GET'])
-def homepage():
+@app.route('/redraft', methods=['GET'])
+def redraft_page():
     service = get_service()
     spreadsheet_id = os.environ["GOOGLE_SPREADSHEET_ID"]
     range_name = os.environ["GOOGLE_CELL_RANGE"]
@@ -42,7 +37,43 @@ def homepage():
         spreadsheetId=spreadsheet_id, range=range_name).execute()
     values = result.get('values', [])
 
-    return render_template('index.html', values=values)
+    owned_players = []
+
+    for player in values:
+        if(player != [] and player[2] != ''):
+            owned_players.append(player[0])
+
+    redraft_no_rookies = webscraper.get_redraft_no_rookies()
+
+    for player in owned_players:
+        redraftPlayerToRemove = process.extractOne(player, redraft_no_rookies)
+        redraft_no_rookies.remove(redraftPlayerToRemove[0])
+
+    return jsonify(redraft_no_rookies)
+
+@app.route('/dynasty', methods=['GET'])
+def dynasty_page():
+    service = get_service()
+    spreadsheet_id = os.environ["GOOGLE_SPREADSHEET_ID"]
+    range_name = os.environ["GOOGLE_CELL_RANGE"]
+
+    result = service.spreadsheets().values().get(
+        spreadsheetId=spreadsheet_id, range=range_name).execute()
+    values = result.get('values', [])
+
+    owned_players = []
+
+    for player in values:
+        if(player != [] and player[2] != ''):
+            owned_players.append(player[0])
+
+    dynasty_no_rookies = webscraper.get_dynasty_no_rookies()
+
+    for player in owned_players:
+        dynastyPlayerToRemove = process.extractOne(player, dynasty_no_rookies)
+        dynasty_no_rookies.remove(dynastyPlayerToRemove[0])
+
+    return jsonify(dynasty_no_rookies)
 
 if __name__ == '__main__':
     app.run(debug=True)
