@@ -21,24 +21,28 @@ rookie_ranks = []
 for tr in redraft_soup.find_all('tr'):
     td = tr.find_all(class_="full-name")
     if(td != []):
-        redraft_ranks.append(td[0].text)
+        redraft_ranks.append(td[0].string)
 
 for tr in dynasty_soup.find_all('tr'):
     td = tr.find_all(class_="full-name")
     if(td != []):
-        dynasty_ranks.append(td[0].text)
+        dynasty_ranks.append(td[0].string)
 
 for tr in rookie_soup.find_all('tr'):
     td = tr.find_all(class_="full-name")
     if(td != []):
-        rookie_ranks.append(td[0].text)
+        rookie_ranks.append(td[0].string)
 
-# for elt in redraft_ranks[:10]:
-#     print(elt)
+redraft_ranks_with_rookies = redraft_ranks
+dynasty_ranks_with_rookies = dynasty_ranks
 
-# for elt in dynasty_ranks[:10]:
-#     print(elt)
+redraft_ranks_without_rookies = []
+dynasty_ranks_without_rookies = []
 
-# for elt in rookie_ranks[:10]:
-#     print(elt)
+for player in redraft_ranks:
+    if(player not in rookie_ranks):
+        redraft_ranks_without_rookies.append(player)
 
+for player in dynasty_ranks:
+    if(player not in rookie_ranks):
+        dynasty_ranks_without_rookies.append(player)
