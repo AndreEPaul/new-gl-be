@@ -27,8 +27,8 @@ def get_service(service_name='sheets', api_version='v4'):
     service = googleapiclient.discovery.build(service_name, api_version, credentials=credentials)
     return service
 
-@app.route('/redraft', methods=['GET'])
-def redraft_page():
+@app.route('/', methods=['GET'])
+def homepage():
     service = get_service()
     spreadsheet_id = os.environ["GOOGLE_SPREADSHEET_ID"]
     range_name = os.environ["GOOGLE_CELL_RANGE"]
