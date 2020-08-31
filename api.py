@@ -49,7 +49,8 @@ def homepage():
         redraftPlayerToRemove = process.extractOne(player, redraft_no_rookies)
         redraft_no_rookies.remove(redraftPlayerToRemove[0])
 
-    return jsonify(redraft_no_rookies)
+    # return jsonify(redraft_no_rookies)
+    return render_template('index.html', values=values)
 
 @app.route('/dynasty', methods=['GET'])
 def dynasty_page():
